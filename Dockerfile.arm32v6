@@ -5,10 +5,8 @@ ARG VERSION=2.6.1
 RUN mkdir -p /app && mkdir -p /etc/prometheus
 WORKDIR /etc/prometheus
 
-ADD https://github.com/prometheus/prometheus/releases/download/v${VERSION}/prometheus-${VERSION}.linux-armv6.tar.gz /app/prometheus-${VERSION}.linux-armv6.tgz
-# COPY prometheus-${VERSION}.linux-armv6.tar.gz /app/prometheus-${VERSION}.linux-armv6.tgz
-
 RUN cd /app \
+    && wget https://github.com/prometheus/prometheus/releases/download/v${VERSION}/prometheus-${VERSION}.linux-armv6.tar.gz \
     && tar xzf prometheus-${VERSION}.linux-armv6.tgz \
     && rm -rf *.tgz \
     && mv /app/prometheus-${VERSION}.linux-armv6/* /app/ \
