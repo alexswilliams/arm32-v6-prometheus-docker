@@ -1,0 +1,24 @@
+FROM arm32v6/alpine:3.8
+
+ARG VERSION=2.6.1
+
+RUN mkdir -p /app && mkdir -p /etc/prometheus
+WORKDIR /etc/prometheus
+
+ADD https://github.com/prometheus/prometheus/releases/download/v${VERSION}/prometheus-${VERSION}.linux-armv6.tar.gz /app/prometheus-${VERSION}.linux-armv6.tgz
+# COPY prometheus-${VERSION}.linux-armv6.tar.gz /app/prometheus-${VERSION}.linux-armv6.tgz
+
+RUN cd /app \
+    && tar xzf prometheus-${VERSION}.linux-armv6.tgz \
+    && rm -rf *.tgz \
+    && mv /app/prometheus-${VERSION}.linux-armv6/* /app/ \
+    && rmdir /app/prometheus-${VERSION}.linux-armv6 \
+    && mkdir -p /app/data \
+    && ln -s /app/prometheus.yml /etc/prometheus/prometheus.yml \
+    && ln -s /app/data /etc/prometheus/data \
+    && ln -s /app/consoles /etc/prometheus/consoles \
+    && ln -s /app/console_libraries /etc/prometheus/console_libraries
+
+EXPOSE 9090
+CMD [ "/app/prometheus", "--web.console.templates=/etc/prometheus/consoles", "--web.console.libraries=/etc/prometheus/console-libraries", "--storage.tsdb.path=/etc/prometheus/data/", "--config.file=/etc/prometheus/prometheus.yml" ]
+
