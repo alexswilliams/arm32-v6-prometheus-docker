@@ -1,14 +1,14 @@
 FROM arm32v6/alpine:3.8
 
-ARG VERSION=2.6.1
+ARG VERSION
 
 RUN mkdir -p /app && mkdir -p /etc/prometheus
 WORKDIR /etc/prometheus
 
 RUN cd /app \
     && wget https://github.com/prometheus/prometheus/releases/download/v${VERSION}/prometheus-${VERSION}.linux-armv6.tar.gz \
-    && tar xzf prometheus-${VERSION}.linux-armv6.tgz \
-    && rm -rf *.tgz \
+    && tar xzf prometheus-${VERSION}.linux-armv6.tar.gz \
+    && rm -f prometheus-${VERSION}.linux-armv6.tar.gz \
     && mv /app/prometheus-${VERSION}.linux-armv6/* /app/ \
     && rmdir /app/prometheus-${VERSION}.linux-armv6 \
     && mkdir -p /app/data \
