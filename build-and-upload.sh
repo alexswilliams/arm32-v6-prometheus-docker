@@ -8,5 +8,9 @@ function buildAndPush {
     docker push alexswilliams/arm32v6-prometheus:${version}
 }
 
-buildAndPush "2.6.1"
-
+# buildAndPush "2.6.1"
+buildAndPush "2.7.0"
+buildAndPush "2.7.1"
+buildAndPush "2.7.2"
+buildAndPush "2.8.0"
+buildAndPush "2.8.1"
