@@ -17,6 +17,9 @@ RUN cd /app \
     && ln -s /app/consoles /etc/prometheus/consoles \
     && ln -s /app/console_libraries /etc/prometheus/console_libraries
 
+COPY run.sh /run.sh
+ENV PROM_VERSION=${VERSION}
+
 EXPOSE 9090
-CMD [ "/app/prometheus", "--web.console.templates=/etc/prometheus/consoles", "--web.console.libraries=/etc/prometheus/console-libraries", "--storage.tsdb.path=/etc/prometheus/data/", "--config.file=/etc/prometheus/prometheus.yml" ]
+ENTRYPOINT [ "/run.sh" ]
 
