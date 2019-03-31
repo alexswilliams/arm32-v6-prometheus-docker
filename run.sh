@@ -1,7 +1,8 @@
 #!/bin/sh
 
-
-
+echo "Starting Prometheus $PROM_VERSION"
+echo "Relevant Environment Variables (PROM_*):"
+env | grep PROM_
 
 /app/prometheus \
     --config.file=${PROM_CONFIG_FILE:-/etc/prometheus/prometheus.yml} \
