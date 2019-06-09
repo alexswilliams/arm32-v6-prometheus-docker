@@ -23,8 +23,9 @@ function buildAndPush {
 #buildAndPush "2.7.2"
 #buildAndPush "2.8.0"
 #buildAndPush "2.8.1"
-buildAndPush "2.9.0"
-buildAndPush "2.9.1"
-buildAndPush "2.9.2"
+#buildAndPush "2.9.0"
+#buildAndPush "2.9.1"
+#buildAndPush "2.9.2"
+buildAndPush "2.10.0"
 
 curl -X POST "https://hooks.microbadger.com/images/alexswilliams/arm32v6-prometheus/H8lh7yTJah4vJT69Kjz-00QLM44="
