@@ -14,10 +14,15 @@ function buildAndPush {
         --file Dockerfile . \
     && docker tag ${imagename}:${version} ${imagename}:${version}-${fromline} \
     && docker push ${imagename}:${version} \
-    && docker push ${imagename}:${version}-${fromline}
+    && docker push ${imagename}:${version}-${fromline} \
+    && (
+        if [ "$2" == "latest" ]; then
+            docker tag ${imagename}:${version} ${imagename}:latest \
+            && docker push ${imagename}:latest
+        fi
+    )
 }
 
-#buildAndPush "2.6.1"
 #buildAndPush "2.7.0"
 #buildAndPush "2.7.1"
 #buildAndPush "2.7.2"
@@ -29,6 +34,6 @@ function buildAndPush {
 #buildAndPush "2.10.0"
 #buildAndPush "2.11.0"
 buildAndPush "2.11.1"
-buildAndPush "2.11.2"
+buildAndPush "2.11.2" latest
 
 curl -X POST "https://hooks.microbadger.com/images/alexswilliams/arm32v6-prometheus/H8lh7yTJah4vJT69Kjz-00QLM44="
