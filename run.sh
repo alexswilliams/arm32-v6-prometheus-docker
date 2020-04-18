@@ -1,23 +1,83 @@
-#!/bin/sh
+#!/bin/bash
 
 echo "Starting Prometheus $PROM_VERSION"
 echo "Relevant Environment Variables (PROM_*):"
 env | grep PROM_
-
-/app/prometheus \
-    --config.file=${PROM_CONFIG_FILE:-/etc/prometheus/prometheus.yml} \
-    --log.format=${PROM_LOG_FORMAT:-logfmt} \
-    --log.level=${PROM_LOG_LEVEL:-info} \
-    --web.external-url=${PROM_WEB_EXTERNAL_URL} \
-    --web.route-prefix=${PROM_WEB_ROUTE_PREFIX} \
-    --web.console.templates=${PROM_WEB_CONSOLE_TEMPLATES:-/etc/prometheus/consoles} \
-    --web.console.libraries=${PROM_WEB_CONSOLE_LIBRARIES:-/etc/prometheus/console-libraries} \
-    --query.max-concurrency=${PROM_QUERY_MAX_CONCURRENCY:-20} \
-    --query.max-samples=${PROM_QUERY_MAX_SAMPLES:-50000000} \
-    --query.timeout=${PROM_QUERY_TIMEOUT:-2m} \
-    --storage.tsdb.path=${PROM_STORAGE_TSDB_PATH:-/etc/prometheus/data/} \
-    --storage.tsdb.retention.time=${PROM_STORAGE_TSDB_RETENTION_TIME:-0s} \
-    --storage.tsdb.retention.size=${PROM_STORAGE_TSDB_RETENTION_SIZE:-0B}
-    $@
+echo ""
 
 
+# Flags updated here: https://github.com/prometheus/prometheus/blob/master/cmd/prometheus/main.go
+# Logger flags updated here: https://github.com/prometheus/common/blob/master/promlog/flag/flag.go
+# With some defaults seen overridden for Docker here: https://github.com/prometheus/prometheus/blob/master/Dockerfile
+
+
+# Booleans are treated specially in kingpin so they need passing in differently.
+declare -a booleans=(
+    web.enable-lifecycle
+    web.enable-admin-api
+    storage.tsdb.no-lockfile
+    storage.tsdb.allow-overlapping-blocks
+    storage.tsdb.wal-compression
+)
+declare -a flags=(
+    config.file
+    web.listen-address
+    web.read-timeout
+    web.max-connections
+    web.external-url
+    web.route-prefix
+    web.user-assets
+    web.console.templates
+    web.console.libraries
+    web.page-title
+    web.cors.origin
+    storage.tsdb.path
+    storage.tsdb.min-block-duration
+    storage.tsdb.max-block-duration
+    storage.tsdb.wal-segment-size
+    storage.tsdb.retention.time
+    storage.tsdb.retention.size
+    storage.remote.flush-deadline
+    storage.remote.read-sample-limit
+    storage.remote.read-concurrent-limit
+    storage.remote.read-max-bytes-in-frame
+    rules.alert.for-outage-tolerance
+    rules.alert.for-grace-period
+    rules.alert.resend-delay
+    alertmanager.notification-queue-capacity
+    alertmanager.timeout
+    query.lookback-delta
+    query.timeout
+    query.max-concurrency
+    query.max-samples
+    log.format
+    log.level
+)
+
+# Defaults taken from original prometheus Dockerfile
+declare -a command=(
+    "/app/prometheus"
+    "--config.file=/etc/prometheus/prometheus.yml"
+    "--storage.tsdb.path=/prometheus"
+    "--web.console.libraries=/usr/share/prometheus/console_libraries"
+    "--web.console.templates=/usr/share/prometheus/consoles"
+)
+
+for flag in "${booleans[@]}"; do
+    envVarName="PROM_$(tr 'a-z-.' 'A-Z__' <<< "${flag}")"
+    lowerVarValue="$(tr 'A-Z' 'a-z' <<< "${!envVarName}")"
+    if [ ! -z "${lowerVarValue}" ]; then
+        if [ "${lowerVarValue}" == "true" ]; then command+=("--${flag}"); else command+=("--no-${flag}"); fi
+    fi
+done
+for flag in "${flags[@]}"; do
+    envVarName="PROM_$(tr 'a-z-.' 'A-Z__' <<< "${flag}")"
+    if [ ! -z "${!envVarName}" ]; then
+        command+=("--${flag}=${!envVarName}")
+    fi
+done
+
+unset envVarName lowerVarValue flag booleans flags
+set -ex
+
+exec "${command[@]}" $@
