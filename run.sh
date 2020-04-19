@@ -64,14 +64,14 @@ declare -a command=(
 )
 
 for flag in "${booleans[@]}"; do
-    envVarName="PROM_$(tr 'a-z-.' 'A-Z__' <<< "${flag}")"
-    lowerVarValue="$(tr 'A-Z' 'a-z' <<< "${!envVarName}")"
+    envVarName="PROM_$(echo "${flag}" | tr 'a-z-.' 'A-Z__')"
+    lowerVarValue="$(echo "${!envVarName}" | tr 'A-Z' 'a-z')"
     if [ ! -z "${lowerVarValue}" ]; then
         if [ "${lowerVarValue}" == "true" ]; then command+=("--${flag}"); else command+=("--no-${flag}"); fi
     fi
 done
 for flag in "${flags[@]}"; do
-    envVarName="PROM_$(tr 'a-z-.' 'A-Z__' <<< "${flag}")"
+    envVarName="PROM_$(echo "${flag}" | tr 'a-z-.' 'A-Z__')"
     if [ ! -z "${!envVarName}" ]; then
         command+=("--${flag}=${!envVarName}")
     fi
