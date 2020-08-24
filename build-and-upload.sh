@@ -52,10 +52,12 @@ function buildAndPush {
 #buildAndPush "2.17.2"
 #buildAndPush "2.18.0"
 #buildAndPush "2.18.1"
-buildAndPush "2.18.2"
-buildAndPush "2.19.0"
-buildAndPush "2.19.1"
-buildAndPush "2.19.2" latest
+#buildAndPush "2.18.2"
+#buildAndPush "2.19.0"
+#buildAndPush "2.19.1"
+#buildAndPush "2.19.2"
+buildAndPush "2.20.0"
+buildAndPush "2.20.1" latest
 
 
 curl -X POST "https://hooks.microbadger.com/images/alexswilliams/arm32v6-prometheus/H8lh7yTJah4vJT69Kjz-00QLM44="
